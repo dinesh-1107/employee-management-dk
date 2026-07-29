@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+
+  backend:
+    image: your-dockerhub-username/employee-backend:1.0.0
+    restart: unless-stopped
+
+  frontend:
+    image: your-dockerhub-username/employee-frontend:1.0.0
+    restart: unless-stopped

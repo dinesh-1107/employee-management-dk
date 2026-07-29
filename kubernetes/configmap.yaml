@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: employee-config
+  namespace: employee-management
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  DB_HOST: "mysql-service"
+  DB_NAME: "employee_db"

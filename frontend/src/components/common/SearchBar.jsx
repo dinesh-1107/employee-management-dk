@@ -1,0 +1,1 @@
+export default function SearchBar({value,onChange}){return <input placeholder='Search employees...' value={value} onChange={e=>onChange(e.target.value)}/>;}

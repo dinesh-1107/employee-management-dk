@@ -1,0 +1,2 @@
+-- Example backup placeholder
+-- Use: mysqldump -u root -p employee_db > backup.sql

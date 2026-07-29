@@ -1,0 +1,31 @@
+pipeline {
+  agent any
+
+  environment {
+    BACKEND_IMAGE='your-dockerhub-username/employee-backend:1.0.0'
+    FRONTEND_IMAGE='your-dockerhub-username/employee-frontend:1.0.0'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+
+    stage('Build Backend') {
+      steps {
+        dir('backend') {
+          sh 'mvn clean package -DskipTests'
+        }
+      }
+    }
+
+    stage('Build Frontend') {
+      steps {
+        dir('frontend') {
+          sh 'npm install'
+          sh 'npm run build'
+        }
+      }
+    }
+  }
+}

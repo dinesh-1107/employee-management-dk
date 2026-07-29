@@ -1,0 +1,1 @@
+export default function DeleteEmployee(){return <h3>Delete Employee (implementation in next part)</h3>}

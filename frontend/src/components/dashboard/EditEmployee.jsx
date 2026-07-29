@@ -1,0 +1,1 @@
+export default function EditEmployee(){return <h3>Edit Employee (implementation in next part)</h3>}

@@ -1,0 +1,1 @@
+export default function Toast({message}){return message?<div>{message}</div>:null;}

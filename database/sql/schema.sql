@@ -1,0 +1,19 @@
+CREATE DATABASE IF NOT EXISTS employee_db;
+USE employee_db;
+
+CREATE TABLE IF NOT EXISTS departments(
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ department_name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS employees(
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ name VARCHAR(100) NOT NULL,
+ email VARCHAR(150) NOT NULL UNIQUE,
+ phone VARCHAR(20),
+ salary DECIMAL(10,2),
+ department_id INT,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT fk_department
+ FOREIGN KEY (department_id) REFERENCES departments(id)
+);
