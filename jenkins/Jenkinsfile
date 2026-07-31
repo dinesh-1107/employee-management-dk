@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'
-    }
+    maven 'Maven-3.9.16'
+}
 
     environment {
         BACKEND_IMAGE = 'employee-backend:1.0.0'
