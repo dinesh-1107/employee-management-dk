@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven'
+    }
+
     environment {
         BACKEND_IMAGE = 'employee-backend:1.0.0'
         FRONTEND_IMAGE = 'employee-frontend:1.0.0'
@@ -30,6 +34,19 @@ pipeline {
                 }
             }
         }
+    }
 
+    post {
+        success {
+            echo '✅ Build completed successfully!'
+        }
+
+        failure {
+            echo '❌ Build failed.'
+        }
+
+        always {
+            cleanWs()
+        }
     }
 }
