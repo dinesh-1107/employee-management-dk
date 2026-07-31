@@ -84,17 +84,16 @@ pipeline {
     }
 }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                bat '''
-                kubectl apply -f k8s/
-                kubectl rollout status deployment/employee-backend
-                kubectl rollout status deployment/employee-frontend
-                '''
-            }
-        }
-
+    stage('Check Kubernetes Access') {
+    steps {
+        bat '''
+        echo USERPROFILE=%USERPROFILE%
+        echo KUBECONFIG=%KUBECONFIG%
+        kubectl config current-context
+        kubectl get nodes
+        '''
     }
+}
 
     post {
         success {
