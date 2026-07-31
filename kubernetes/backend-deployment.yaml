@@ -25,3 +25,22 @@ spec:
 
           ports:
             - containerPort: 5000
+
+          env:
+            - name: DB_HOST
+              value: mysql
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: employee-secret
+                  key: DB_USERNAME
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: employee-secret
+                  key: DB_PASSWORD
+
+            - name: DB_NAME
+              value: employee_db
