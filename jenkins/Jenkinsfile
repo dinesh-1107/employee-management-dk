@@ -31,7 +31,6 @@ pipeline {
                 dir('backend') {
                     bat 'docker build -t employee-backend:latest .'
                 }
-
                 dir('frontend') {
                     bat 'docker build -t employee-frontend:latest .'
                 }
@@ -43,11 +42,9 @@ pipeline {
         success {
             echo '✅ CI Pipeline completed successfully!'
         }
-
         failure {
             echo '❌ CI Pipeline failed.'
         }
-
         always {
             cleanWs()
         }
