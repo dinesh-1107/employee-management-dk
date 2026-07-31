@@ -1,15 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-    maven 'Maven-3.9.16'
-}
-
-    environment {
-        BACKEND_IMAGE = 'employee-backend:1.0.0'
-        FRONTEND_IMAGE = 'employee-frontend:1.0.0'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -21,7 +12,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    bat 'mvn clean package -DskipTests'
+                    bat 'npm install'
                 }
             }
         }
@@ -34,15 +25,27 @@ pipeline {
                 }
             }
         }
+
+        stage('Build Docker Images') {
+            steps {
+                dir('backend') {
+                    bat 'docker build -t employee-backend:latest .'
+                }
+
+                dir('frontend') {
+                    bat 'docker build -t employee-frontend:latest .'
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo '✅ Build completed successfully!'
+            echo '✅ CI Pipeline completed successfully!'
         }
 
         failure {
-            echo '❌ Build failed.'
+            echo '❌ CI Pipeline failed.'
         }
 
         always {
