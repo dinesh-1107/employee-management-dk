@@ -83,38 +83,44 @@ pipeline {
         whoami
         echo USERPROFILE=%USERPROFILE%
         echo KUBECONFIG=%KUBECONFIG%
-        kubectl config current-context || echo No kubeconfig found
-        '''
-    }
-}
-
-        stage('Check Kubernetes Access') {
-    steps {
-        bat '''
-        set KUBECONFIG=C:\\Users\\dines\\.kube\\config
-
-        echo USERPROFILE=%USERPROFILE%
-        echo KUBECONFIG=%KUBECONFIG%
 
         kubectl config current-context
-        kubectl get nodes
+
+        if %ERRORLEVEL% neq 0 (
+            echo No kubeconfig found
+            exit /b 0
+        )
         '''
     }
 }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                bat '''
-                set KUBECONFIG=C:\\Users\\dines\\.kube\\config
+       stage('Check Kubernetes Access') {
+    steps {
+        withEnv(['KUBECONFIG=C:\\Users\\dines\\.kube\\config']) {
+            bat '''
+            echo USERPROFILE=%USERPROFILE%
+            echo KUBECONFIG=%KUBECONFIG%
 
-                kubectl apply -f k8s/
-
-                kubectl rollout status deployment/employee-backend
-
-                kubectl rollout status deployment/employee-frontend
-                '''
-            }
+            kubectl config view
+            kubectl config current-context
+            kubectl get nodes
+            '''
         }
+    }
+}
+
+stage('Deploy to Kubernetes') {
+    steps {
+        withEnv(['KUBECONFIG=C:\\Users\\dines\\.kube\\config']) {
+            bat '''
+            kubectl apply -f k8s/
+
+            kubectl rollout status deployment/employee-backend
+
+            kubectl rollout status deployment/employee-frontend
+            '''
+        }
+    }
     }
 
     post {
