@@ -74,6 +74,16 @@ pipeline {
             }
         }
 
+        stage('Check User') {
+    steps {
+        bat '''
+        whoami
+        echo %USERPROFILE%
+        kubectl config current-context
+        '''
+    }
+}
+
         stage('Deploy to Kubernetes') {
             steps {
                 bat '''
