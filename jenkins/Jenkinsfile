@@ -78,27 +78,29 @@ pipeline {
         }
 
         stage('Check User') {
-            steps {
-                bat '''
-                whoami
-                echo USERPROFILE=%USERPROFILE%
-                echo KUBECONFIG=%KUBECONFIG%
-                kubectl config current-context
-                '''
-            }
-        }
+    steps {
+        bat '''
+        whoami
+        echo USERPROFILE=%USERPROFILE%
+        echo KUBECONFIG=%KUBECONFIG%
+        kubectl config current-context || echo No kubeconfig found
+        '''
+    }
+}
 
         stage('Check Kubernetes Access') {
-            steps {
-                bat '''
-                set KUBECONFIG=C:\\Users\\dines\\.kube\\config
-                echo USERPROFILE=%USERPROFILE%
-                echo KUBECONFIG=%KUBECONFIG%
-                kubectl config current-context
-                kubectl get nodes
-                '''
-            }
-        }
+    steps {
+        bat '''
+        set KUBECONFIG=C:\\Users\\dines\\.kube\\config
+
+        echo USERPROFILE=%USERPROFILE%
+        echo KUBECONFIG=%KUBECONFIG%
+
+        kubectl config current-context
+        kubectl get nodes
+        '''
+    }
+}
 
         stage('Deploy to Kubernetes') {
             steps {
