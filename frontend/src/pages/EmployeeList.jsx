@@ -364,3 +364,25 @@ console.log(response.data);
     </tr>
   )}
 </tbody>
+</Table>
+</div>
+</div>
+</div>
+
+<AddEmployeeModal
+  show={showModal}
+  handleClose={handleClose}
+  handleSave={handleSaveEmployee}
+  isEditing={isEditing}
+  employee={selectedEmployee}
+/>
+
+<ViewEmployeeModal
+  show={showViewModal}
+  handleClose={handleCloseViewModal}
+  employee={viewEmployee}
+/>
+</div>
+</>
+);
+}
