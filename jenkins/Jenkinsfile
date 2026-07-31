@@ -78,50 +78,52 @@ pipeline {
         }
 
         stage('Check User') {
-    steps {
-        bat '''
-        whoami
-        echo USERPROFILE=%USERPROFILE%
-        echo KUBECONFIG=%KUBECONFIG%
+            steps {
+                bat '''
+                whoami
+                echo USERPROFILE=%USERPROFILE%
+                echo KUBECONFIG=%KUBECONFIG%
 
-        kubectl config current-context
+                kubectl config current-context
 
-        if %ERRORLEVEL% neq 0 (
-            echo No kubeconfig found
-            exit /b 0
-        )
-        '''
-    }
-}
-
-       stage('Check Kubernetes Access') {
-    steps {
-        withEnv(['KUBECONFIG=C:\\Users\\dines\\.kube\\config']) {
-            bat '''
-            echo USERPROFILE=%USERPROFILE%
-            echo KUBECONFIG=%KUBECONFIG%
-
-            kubectl config view
-            kubectl config current-context
-            kubectl get nodes
-            '''
+                if %ERRORLEVEL% neq 0 (
+                    echo No kubeconfig found
+                    exit /b 0
+                )
+                '''
+            }
         }
-    }
-}
 
-stage('Deploy to Kubernetes') {
-    steps {
-        withEnv(['KUBECONFIG=C:\\Users\\dines\\.kube\\config']) {
-            bat '''
-            kubectl apply -f k8s/
+        stage('Check Kubernetes Access') {
+            steps {
+                withEnv(['KUBECONFIG=C:\\Users\\dines\\.kube\\config']) {
+                    bat '''
+                    echo USERPROFILE=%USERPROFILE%
+                    echo KUBECONFIG=%KUBECONFIG%
 
-            kubectl rollout status deployment/employee-backend
-
-            kubectl rollout status deployment/employee-frontend
-            '''
+                    kubectl config view
+                    kubectl config current-context
+                    kubectl get nodes
+                    '''
+                }
+            }
         }
-    }
-    }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                withEnv(['KUBECONFIG=C:\\Users\\dines\\.kube\\config']) {
+                    bat '''
+                    kubectl apply -f k8s/
+
+                    kubectl rollout status deployment/employee-backend
+
+                    kubectl rollout status deployment/employee-frontend
+                    '''
+                }
+            }
+        }
+
+    }   // <-- stages block closed here
 
     post {
         success {
