@@ -1,79 +1,100 @@
-stages {
+pipeline {
+    agent any
 
-    stage('Checkout') {
-        steps {
-            checkout scm
-        }
+    environment {
+        DOCKER_USER = "pinkyma1107"
     }
 
-    stage('Build Backend') {
-        steps {
-            dir('backend') {
-                bat 'npm install'
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
             }
         }
-    }
 
-    stage('Build Frontend') {
-        steps {
-            dir('frontend') {
-                bat 'npm install'
-                bat 'npm run build'
+        stage('Build Backend') {
+            steps {
+                dir('backend') {
+                    bat 'npm install'
+                }
             }
         }
-    }
 
-    stage('Build Docker Images') {
-        steps {
-            dir('backend') {
-                bat 'docker build -t employee-backend:latest .'
-            }
-            dir('frontend') {
-                bat 'docker build -t employee-frontend:latest .'
+        stage('Build Frontend') {
+            steps {
+                dir('frontend') {
+                    bat 'npm install'
+                    bat 'npm run build'
+                }
             }
         }
-    }
 
-    stage('Docker Login') {
-        steps {
-            withCredentials([usernamePassword(
-                credentialsId: 'dockerhub-creds',
-                usernameVariable: 'DOCKER_USERNAME',
-                passwordVariable: 'DOCKER_PASSWORD'
-            )]) {
+        stage('Build Docker Images') {
+            steps {
+                dir('backend') {
+                    bat 'docker build -t employee-backend:latest .'
+                }
+                dir('frontend') {
+                    bat 'docker build -t employee-frontend:latest .'
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    bat '''
+                    docker logout
+                    echo|set /p="%DOCKER_PASSWORD%" | docker login -u %DOCKER_USERNAME% --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Push Backend Image') {
+            steps {
                 bat '''
-                docker logout
-                echo|set /p="%DOCKER_PASSWORD%" | docker login -u %DOCKER_USERNAME% --password-stdin
+                docker tag employee-backend:latest %DOCKER_USER%/employee-backend:latest
+                docker push %DOCKER_USER%/employee-backend:latest
                 '''
             }
         }
-    }
 
-    stage('Push Backend Image') {
-        steps {
-            bat '''
-            docker tag employee-backend:latest %DOCKER_USER%/employee-backend:latest
-            docker push %DOCKER_USER%/employee-backend:latest
-            '''
+        stage('Push Frontend Image') {
+            steps {
+                bat '''
+                docker tag employee-frontend:latest %DOCKER_USER%/employee-frontend:latest
+                docker push %DOCKER_USER%/employee-frontend:latest
+                '''
+            }
         }
-    }
 
-    stage('Push Frontend Image') {
-        steps {
-            bat '''
-            docker tag employee-frontend:latest %DOCKER_USER%/employee-frontend:latest
-            docker push %DOCKER_USER%/employee-frontend:latest
-            '''
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat '''
+                kubectl apply -f k8s/
+                kubectl rollout status deployment/employee-backend
+                kubectl rollout status deployment/employee-frontend
+                '''
+            }
         }
+
     }
 
-    stage('Deploy to Kubernetes') {
-        steps {
-            bat '''
-            kubectl apply -f k8s/
-            kubectl rollout status deployment/employee-backend
-            kubectl rollout status deployment/employee-frontend
-            '''
+    post {
+        success {
+            echo '✅ CI Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ CI Pipeline failed.'
+        }
+        always {
+            cleanWs()
         }
     }
 }
