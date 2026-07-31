@@ -35,6 +35,7 @@ pipeline {
                 dir('backend') {
                     bat 'docker build -t employee-backend:latest .'
                 }
+
                 dir('frontend') {
                     bat 'docker build -t employee-frontend:latest .'
                 }
@@ -43,11 +44,13 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USERNAME',
-                    passwordVariable: 'DOCKER_PASSWORD'
-                )]) {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
                     bat '''
                     docker logout
                     echo|set /p="%DOCKER_PASSWORD%" | docker login -u %DOCKER_USERNAME% --password-stdin
@@ -75,33 +78,52 @@ pipeline {
         }
 
         stage('Check User') {
-    steps {
-        bat '''
-        whoami
-        echo %USERPROFILE%
-        kubectl config current-context
-        '''
-    }
-}
+            steps {
+                bat '''
+                whoami
+                echo USERPROFILE=%USERPROFILE%
+                echo KUBECONFIG=%KUBECONFIG%
+                kubectl config current-context
+                '''
+            }
+        }
 
-    stage('Check Kubernetes Access') {
-    steps {
-        bat '''
-        echo USERPROFILE=%USERPROFILE%
-        echo KUBECONFIG=%KUBECONFIG%
-        kubectl config current-context
-        kubectl get nodes
-        '''
+        stage('Check Kubernetes Access') {
+            steps {
+                bat '''
+                set KUBECONFIG=C:\\Users\\dines\\.kube\\config
+                echo USERPROFILE=%USERPROFILE%
+                echo KUBECONFIG=%KUBECONFIG%
+                kubectl config current-context
+                kubectl get nodes
+                '''
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat '''
+                set KUBECONFIG=C:\\Users\\dines\\.kube\\config
+
+                kubectl apply -f k8s/
+
+                kubectl rollout status deployment/employee-backend
+
+                kubectl rollout status deployment/employee-frontend
+                '''
+            }
+        }
     }
-}
 
     post {
         success {
             echo '✅ CI Pipeline completed successfully!'
         }
+
         failure {
             echo '❌ CI Pipeline failed.'
         }
+
         always {
             cleanWs()
         }
