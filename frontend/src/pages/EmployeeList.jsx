@@ -13,7 +13,7 @@ import {
 import AddEmployeeModal from "../components/employee/AddEmployeeModal.jsx";
 import ViewEmployeeModal from "../components/employee/ViewEmployeeModal.jsx";
 
-const API_BASE_URL = "http://localhost:5000/api/employees";
+const API_BASE_URL ="http://localhost:5001/api/employees" ;
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
@@ -372,9 +372,9 @@ console.log(response.data);
 <AddEmployeeModal
   show={showModal}
   handleClose={handleClose}
-  handleSave={handleSaveEmployee}
+  onSave={handleSaveEmployee}
   isEditing={isEditing}
-  employee={selectedEmployee}
+  selectedEmployee={selectedEmployee}
 />
 
 <ViewEmployeeModal

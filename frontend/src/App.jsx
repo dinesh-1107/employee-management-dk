@@ -54,11 +54,11 @@ export default function App() {
       />
 
       {/* Invalid Route */}
-      <Route
-        path="*"
-        element={<Navigate to="/login" replace />}
-      />
-
+      
+<Route
+  path="/employees"
+  element={<h1 style={{ padding: "20px" }}>Employees Page Working ✅</h1>}
+/>
     </Routes>
   );
 }

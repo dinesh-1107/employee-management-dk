@@ -1,20 +1,33 @@
 const db = require("../config/db");
 
+// ======================
 // GET All Employees
+// ======================
 const getEmployees = (req, res) => {
+  console.log("GET /api/employees");
+
   const sql = "SELECT * FROM employees";
 
   db.query(sql, (err, result) => {
     if (err) {
-      return res.status(500).json(err);
+      console.error("GET Error:", err);
+      return res.status(500).json({
+        message: "Failed to fetch employees",
+        error: err.message,
+      });
     }
 
     res.status(200).json(result);
   });
 };
 
+// ======================
 // ADD Employee
+// ======================
 const addEmployee = (req, res) => {
+  console.log("POST /api/employees");
+  console.log(req.body);
+
   const {
     name,
     email,
@@ -37,7 +50,11 @@ const addEmployee = (req, res) => {
     [name, email, phone, department, role, salary, joining_date, status],
     (err, result) => {
       if (err) {
-        return res.status(500).json(err);
+        console.error("INSERT Error:", err);
+        return res.status(500).json({
+          message: "Failed to add employee",
+          error: err.message,
+        });
       }
 
       res.status(201).json({
@@ -48,11 +65,11 @@ const addEmployee = (req, res) => {
   );
 };
 
+// ======================
 // UPDATE Employee
+// ======================
 const updateEmployee = (req, res) => {
-  console.log("========== PUT API HIT ==========");
-  console.log("ID:", req.params.id);
-  console.log("BODY:", req.body);
+  console.log("PUT /api/employees/:id");
 
   const { id } = req.params;
 
@@ -82,20 +99,7 @@ const updateEmployee = (req, res) => {
   `;
 
   db.query(
-    [
-      sql,
-      [
-        name,
-        email,
-        phone,
-        department,
-        role,
-        salary,
-        joining_date,
-        status,
-        id,
-      ]
-    ][0],
+    sql,
     [
       name,
       email,
@@ -109,7 +113,11 @@ const updateEmployee = (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        return res.status(500).json(err);
+        console.error("UPDATE Error:", err);
+        return res.status(500).json({
+          message: "Failed to update employee",
+          error: err.message,
+        });
       }
 
       res.status(200).json({
@@ -119,30 +127,37 @@ const updateEmployee = (req, res) => {
   );
 };
 
+// ======================
 // DELETE Employee
+// ======================
 const deleteEmployee = (req, res) => {
+  console.log("DELETE /api/employees/:id");
+
   const { id } = req.params;
 
-  const sql = "DELETE FROM employees WHERE id = ?";
+  db.query(
+    "DELETE FROM employees WHERE id = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        console.error("DELETE Error:", err);
+        return res.status(500).json({
+          message: "Failed to delete employee",
+          error: err.message,
+        });
+      }
 
-  db.query(sql, [id], (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        message: "Delete Failed",
-        error: err.message,
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          message: "Employee Not Found",
+        });
+      }
+
+      res.status(200).json({
+        message: "Employee Deleted Successfully",
       });
     }
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({
-        message: "Employee Not Found",
-      });
-    }
-
-    res.status(200).json({
-      message: "Employee Deleted Successfully",
-    });
-  });
+  );
 };
 
 module.exports = {
