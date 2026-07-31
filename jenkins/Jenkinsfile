@@ -58,6 +58,24 @@ pipeline {
 
     }   // <-- stages block ends here
 
+    stage('Push Backend Image') {
+    steps {
+        bat '''
+        docker tag employee-backend:latest %DOCKER_USER%/employee-backend:latest
+        docker push %DOCKER_USER%/employee-backend:latest
+        '''
+    }
+}
+
+stage('Push Frontend Image') {
+    steps {
+        bat '''
+        docker tag employee-frontend:latest %DOCKER_USER%/employee-frontend:latest
+        docker push %DOCKER_USER%/employee-frontend:latest
+        '''
+    }
+}
+
     post {
         success {
             echo '✅ CI Pipeline completed successfully!'
